@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #20120f;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dictionaryserver.FXMLDocumentController">
+   <children>
+      <AnchorPane layoutX="383.0" layoutY="40.0" prefHeight="321.0" prefWidth="285.0" style="-fx-background-color: #9c2b27;">
+         <children>
+            <FontAwesomeIconView fill="WHITE" glyphName="DESKTOP" layoutX="46.0" layoutY="222.0" size="180" />
+            <FontAwesomeIconView fill="WHITE" glyphName="SERVER" layoutX="33.0" layoutY="299.0" size="40" />
+            <Label alignment="CENTER" layoutX="33.0" layoutY="265.0" prefHeight="35.0" prefWidth="219.0" text="Database Server" textFill="WHITE" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </AnchorPane>
+      <Label layoutX="29.0" layoutY="151.0" prefHeight="35.0" prefWidth="275.0" text="Welcome to Dictionary Server" textFill="WHITE">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="29.0" layoutY="192.0" prefHeight="17.0" prefWidth="307.0" text="By the community for the  community " textFill="WHITE" />
+      <FontAwesomeIconView fill="WHITE" glyphName="USERS" layoutX="147.0" layoutY="105.0" size="80" text="" />
+      <Label alignment="CENTER" layoutX="56.0" layoutY="361.0" prefHeight="17.0" prefWidth="268.0" text="©All Right Reserved  2019" textFill="WHITE" />
+   </children>
+</AnchorPane>

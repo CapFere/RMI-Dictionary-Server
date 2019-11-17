@@ -8,18 +8,28 @@ package dictionaryserver;
 import java.net.URL;
 
 import java.util.ResourceBundle;
+import javafx.fxml.FXML;
 
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 
 /**
  *
  * @author Captain
  */
 public class FXMLDocumentController implements Initializable {
-
+    public int port;
+    @FXML
+    private Label portField;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
+    
+    public  void setParameters(int port){
+        this.port = port;
+        portField.setText("Database Server PORT "+ this.port);
+    }
+    
 
 }

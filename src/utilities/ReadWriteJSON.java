@@ -37,7 +37,6 @@ public class ReadWriteJSON {
         } catch (Exception e) {
 
         }
-        System.out.println("Size" + dictionaries.length());
         for (int i = 0; i < dictionaries.length(); i++) {
             JSONObject word = (JSONObject) dictionaries.getJSONObject(i);
             if (word.getString("keyword").equalsIgnoreCase(dictionary.getKeyword())) {
@@ -89,10 +88,8 @@ public class ReadWriteJSON {
     }
 
     public Dictionary removeFromJSON(String filename, Dictionary dictionary) throws IOException{
-            System.out.println("you here 2");
             Dictionary readDictionary = readFromJSON(filename, dictionary);
-            System.out.println("you here 3");
-            if (dictionary != null) {
+            if (readDictionary != null) {
                 File f = new File(filename);
                 InputStream is = new FileInputStream(f);
                 JSONTokener tokener = new JSONTokener(is);
@@ -113,6 +110,7 @@ public class ReadWriteJSON {
                     FileWriter file = new FileWriter(filename);
                     file.write(newDictionaries.toString());
                     file.flush();
+                    return dictionary;
                 } catch (Exception e) {
                     
                 }

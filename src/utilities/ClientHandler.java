@@ -21,15 +21,17 @@ public class ClientHandler implements Runnable {
     final ObjectInputStream objectInputStream;
     final ObjectOutputStream objectOutputStream;
     Socket s;
+    String FILEPATH;
     ReadWriteJSON readWriteJSON;
 
     // constructor
     public ClientHandler(Socket s,
-            ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) {
+            ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream, String FILEPATH) {
         this.objectInputStream = objectInputStream;
         this.objectOutputStream = objectOutputStream;
         this.s = s;
         readWriteJSON = new ReadWriteJSON();
+        this.FILEPATH = FILEPATH;
 
     }
 
@@ -40,40 +42,41 @@ public class ClientHandler implements Runnable {
             // receive the string
 
             Dictionary received = (Dictionary) objectInputStream.readObject();
+            synchronized (received) {
+                if (received.getRequest().equalsIgnoreCase("find")) {
+                    Dictionary dictionary = readWriteJSON.readFromJSON(this.FILEPATH, received);
+                    if (dictionary != null) {
+                        received = dictionary;
+                        received.setWasSucceful(true);
+                    } else {
+                        received.setWasSucceful(false);
+                    }
 
-            if (received.getRequest().equalsIgnoreCase("find")) {
-                Dictionary dictionary = readWriteJSON.readFromJSON("dictionary.json", received);
-                if (dictionary != null) {
-                    received = dictionary;
-                    received.setWasSucceful(true);
-                } else {
-                    received.setWasSucceful(false);
+                } else if (received.getRequest().equalsIgnoreCase("add")) {
+
+                    Dictionary dictionary = readWriteJSON.writeToJSON(this.FILEPATH, received);
+                    if (dictionary != null) {
+                        received = dictionary;
+                        received.setWasSucceful(true);
+                    } else {
+                        received.setWasSucceful(false);
+                    }
+
+                } else if (received.getRequest().equalsIgnoreCase("remove")) {
+                    Dictionary dictionary = readWriteJSON.removeFromJSON(this.FILEPATH, received);
+                    if (dictionary != null) {
+                        received = dictionary;
+                        received.setWasSucceful(true);
+                    } else {
+                        received.setWasSucceful(false);
+                    }
+
                 }
-
-            } else if (received.getRequest().equalsIgnoreCase("add")) {
-
-                Dictionary dictionary = readWriteJSON.writeToJSON("dictionary.json", received);
-                if (dictionary != null) {
-                    received = dictionary;
-                    received.setWasSucceful(true);
-                } else {
-                    received.setWasSucceful(false);
-                }
-
-            } else if (received.getRequest().equalsIgnoreCase("remove")) {
-                Dictionary dictionary = readWriteJSON.removeFromJSON("dictionary.json", received);
-                if(dictionary!=null){
-                    received = dictionary;
-                    received.setWasSucceful(true);
-                }else{
-                    received.setWasSucceful(false);
-                }
-
             }
 
             objectOutputStream.writeObject(received);
         } catch (Exception e) {
-            System.out.println("Exception occured"+e);
+
         }
 
     }

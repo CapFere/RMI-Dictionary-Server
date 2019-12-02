@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +32,8 @@ import models.Dictionary;
  */
 public class DictionaryServer extends Application {
 
-    public static ServerSocket ss = null;
-    public static int PORT;
+    public static Registry registary = null;
+    public static int PORT=1212;
     public static String FILEPATH;
 
     @Override
@@ -84,39 +86,24 @@ public class DictionaryServer extends Application {
             public void run() {
 
                 try {
+                    ClientHandler clientHandler = new ClientHandler(FILEPATH);
+                    registary = LocateRegistry.createRegistry(PORT);
+                    registary.rebind("dict", clientHandler);
+                    System.out.println("Server Started");
 
-                    ss = new ServerSocket(PORT);
-
-                    System.out.println("Server running at port" + PORT);
-                    Socket s;
-                    while (true) {
-                        s = ss.accept();
-
-                        // obtain input and output streams
-                        ObjectInputStream objectInputStream = new ObjectInputStream(s.getInputStream());
-                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(s.getOutputStream());
-
-                        ClientHandler mtch = new ClientHandler(s, objectInputStream, objectOutputStream, FILEPATH);
-
-                        // Create a new Thread with this object.
-                        Thread t = new Thread(mtch);
-
-                        // start the thread.
-                        t.start();
-
-                    }
-                } catch (IOException ex) {
+                    
+                } catch (Exception ex) {
                     System.out.println("ERROR: PORT Aready Taken or Invalid PORT");
                     try {
-                        ss.close();
-                    } catch (IOException ex1) {
+                        registary.unbind("dictionary");
+                    } catch (Exception ex1) {
                         
                     }
                     Platform.exit();
                     System.exit(0);
                 }
                 try {
-                    ss.close();
+                    registary.unbind("dictionary");
                 } catch (Exception e) {
                 }
             }
@@ -129,7 +116,8 @@ public class DictionaryServer extends Application {
     @Override
     public void stop() {
         try {
-            ss.close();
+           registary.unbind("dictionary");
+           registary = null;
         } catch (Exception e) {
         }
     }

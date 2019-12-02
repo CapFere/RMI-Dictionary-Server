@@ -5,79 +5,78 @@
  */
 package utilities;
 
+import interfaces.DictionaryServerInterface;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.List;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
 import models.Dictionary;
 
 /**
  *
  * @author Captain
  */
-public class ClientHandler implements Runnable {
+public class ClientHandler extends UnicastRemoteObject implements DictionaryServerInterface {
 
-    final ObjectInputStream objectInputStream;
-    final ObjectOutputStream objectOutputStream;
-    Socket s;
     String FILEPATH;
     ReadWriteJSON readWriteJSON;
 
     // constructor
-    public ClientHandler(Socket s,
-            ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream, String FILEPATH) {
-        this.objectInputStream = objectInputStream;
-        this.objectOutputStream = objectOutputStream;
-        this.s = s;
+    public ClientHandler(String FILEPATH) throws RemoteException {
+        super();
         readWriteJSON = new ReadWriteJSON();
         this.FILEPATH = FILEPATH;
 
     }
 
     @Override
-    public void run() {
-
+    public Dictionary findWord(Dictionary dictionary) throws RemoteException {
         try {
-            // receive the string
-
-            Dictionary received = (Dictionary) objectInputStream.readObject();
-            synchronized (received) {
-                if (received.getRequest().equalsIgnoreCase("find")) {
-                    Dictionary dictionary = readWriteJSON.readFromJSON(this.FILEPATH, received);
-                    if (dictionary != null) {
-                        received = dictionary;
-                        received.setWasSucceful(true);
-                    } else {
-                        received.setWasSucceful(false);
-                    }
-
-                } else if (received.getRequest().equalsIgnoreCase("add")) {
-
-                    Dictionary dictionary = readWriteJSON.writeToJSON(this.FILEPATH, received);
-                    if (dictionary != null) {
-                        received = dictionary;
-                        received.setWasSucceful(true);
-                    } else {
-                        received.setWasSucceful(false);
-                    }
-
-                } else if (received.getRequest().equalsIgnoreCase("remove")) {
-                    Dictionary dictionary = readWriteJSON.removeFromJSON(this.FILEPATH, received);
-                    if (dictionary != null) {
-                        received = dictionary;
-                        received.setWasSucceful(true);
-                    } else {
-                        received.setWasSucceful(false);
-                    }
-
-                }
+            Dictionary result = readWriteJSON.readFromJSON(this.FILEPATH, dictionary);
+            if (result != null) {
+                dictionary = result;
+                dictionary.setWasSucceful(true);
+            } else {
+                dictionary.setWasSucceful(false);
             }
 
-            objectOutputStream.writeObject(received);
-        } catch (Exception e) {
+        } catch (IOException ex) {
 
         }
+        return dictionary;
+    }
 
+    @Override
+    public Dictionary addWord(Dictionary dictionary) throws RemoteException {
+        try {
+            Dictionary result = readWriteJSON.writeToJSON(this.FILEPATH, dictionary);
+            if (result != null) {
+                dictionary = result;
+                dictionary.setWasSucceful(true);
+            } else {
+                dictionary.setWasSucceful(false);
+            }
+
+        } catch (IOException ex) {
+
+        }
+        return dictionary;
+    }
+
+    @Override
+    public Dictionary deleteWord(Dictionary dictionary) throws RemoteException {
+        try {
+            Dictionary result = readWriteJSON.removeFromJSON(this.FILEPATH, dictionary);
+            if (result != null) {
+                dictionary = result;
+                dictionary.setWasSucceful(true);
+            } else {
+                dictionary.setWasSucceful(false);
+            }
+
+        } catch (IOException ex) {
+
+        }
+        return dictionary;
     }
 }
